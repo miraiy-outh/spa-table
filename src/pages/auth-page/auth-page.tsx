@@ -7,11 +7,44 @@ import {
   Typography,
 } from "@mui/material";
 import { blue } from "@mui/material/colors";
-import "./auth-page.scss";
+import { useState } from "react";
+import { getAuthToken, getTable } from "../../api";
+import { useNavigate } from "react-router-dom";
 
 export function AuthPage() {
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ login: false, password: false });
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    const isLoginEmpty = login.trim() === "";
+    const isPasswordEmpty = password.trim() === "";
+
+    if (isLoginEmpty || isPasswordEmpty) {
+      setErrors({
+        login: isLoginEmpty,
+        password: isPasswordEmpty,
+      });
+    } else {
+      getAuthToken(login, password)
+        .then(() => {
+          getTable();
+          navigate("/table");
+        })
+        .catch((error) => {
+          console.error("Ошибка авторизации:", error);
+        });
+    }
+  };
+
   return (
-    <Container component="main" maxWidth={false} sx={{ height: "100vh" }}>
+    <Container
+      component="main"
+      disableGutters
+      maxWidth={false}
+      sx={{ height: "100vh" }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -66,6 +99,12 @@ export function AuthPage() {
                 autoComplete="login"
                 autoFocus
                 sx={{ minWidth: "400px" }}
+                onChange={(e) => {
+                  setLogin(e.target.value);
+                  setErrors((prev) => ({ ...prev, login: false }));
+                }}
+                error={errors.login}
+                helperText={errors.login && "Поле логина не может быть пустым"}
               />
               <TextField
                 margin="normal"
@@ -76,12 +115,21 @@ export function AuthPage() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrors((prev) => ({ ...prev, password: false }));
+                }}
+                error={errors.password}
+                helperText={
+                  errors.password && "Поле пароля не может быть пустым"
+                }
               />
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
                 sx={{ mt: 4, maxWidth: "200px" }}
+                onClick={handleLogin}
               >
                 Войти
               </Button>
