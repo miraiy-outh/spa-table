@@ -1,0 +1,4 @@
+export const TABLE_INIT: "TABLE_INIT" = "TABLE_INIT";
+export const TABLE_ADD: "TABLE_ADD" = "TABLE_ADD";
+export const TABLE_CHANGE: "TABLE_CHANGE" = "TABLE_CHANGE";
+export const TABLE_DELETE: "TABLE_DELETE" = "TABLE_DELETE";

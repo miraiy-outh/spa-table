@@ -1,3 +1,5 @@
+import { TTable } from "./services/reducer";
+
 const HOST = "https://test.v5.pryaniky.com";
 
 function saveToken(token: string) {
@@ -9,7 +11,10 @@ function getToken(): string {
   return token ? token : "";
 }
 
-export function getAuthToken(username: string, password: string) {
+export async function getAuthToken(
+  username: string,
+  password: string
+): Promise<string> {
   return fetch(`${HOST}/ru/data/v3/testmethods/docs/login`, {
     method: "POST",
     headers: {
@@ -31,7 +36,7 @@ export function getAuthToken(username: string, password: string) {
   });
 }
 
-export function getTable() {
+export async function getTable(): Promise<TTable[]> {
   return fetch(`${HOST}/ru/data/v3/testmethods/docs/userdocs/get`, {
     method: "GET",
     headers: {
