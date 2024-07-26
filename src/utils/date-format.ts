@@ -1,4 +1,4 @@
-import { TDateISO } from "../services/datetime-types";
+import { TDateISO } from "../services/types/datetime-types";
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 
@@ -14,11 +14,13 @@ export function formatDateFromISO(date: TDateISO) {
   return [`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`, gmt];
 }
 
-export function formatDateToISO(date: Date) {
-  const year = date.getFullYear();
+export function formatDateToISO(
+  date: Date
+): `${string}-${string}-${string}T${string}:${string}:${string}.${string}Z` {
+  const year = date.getFullYear().toString();
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
-  const hours = pad(date.getHours());
+  const hours = pad(date.getHours() - 3);
   const minutes = pad(date.getMinutes());
   const seconds = pad(date.getSeconds());
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.017Z`;

@@ -10,4 +10,6 @@ type TDateISODate = `${TYear}-${TMonth}-${TDay}`;
 
 type TDateISOTime = `${THours}:${TMinutes}:${TSeconds}.${TMilliseconds}`;
 
-export type TDateISO = `${TDateISODate}T${TDateISOTime}Z`;
+export type TDateISO =
+  | `${TDateISODate}T${TDateISOTime}Z`
+  | `${string}-${string}-${string}T${string}:${string}:${string}.${string}Z`;
