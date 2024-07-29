@@ -61,8 +61,6 @@ export async function deleteLine(id: string) {
   }).then(async (res) => {
     if (res.status === 200) {
       const data = await res.json();
-      console.log(id);
-      console.log(data);
       if (data.error_code === 0)
         return Promise.resolve(`Line with id=${id} deleted`);
       else return Promise.reject(new Error("Line delete failed"));
@@ -83,7 +81,6 @@ export async function addLine(line: TTableExport) {
     if (res.status === 200) {
       return await Promise.resolve("New line created");
     }
-    console.log(line, JSON.stringify(line));
     return Promise.reject(new Error("Line add failed"));
   });
 }
@@ -100,7 +97,6 @@ export async function changeLine(line: TTableExport, id: string) {
     if (res.status === 200) {
       return await Promise.resolve(`Line with id=${id} changed`);
     }
-    console.log(line, JSON.stringify(line));
     return Promise.reject(new Error("Line change failed"));
   });
 }
