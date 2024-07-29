@@ -10,17 +10,17 @@ export function RootPage() {
 
   useEffect(() => {
     if (token) {
-      navigate("/spa-table/table");
+      navigate("table");
     } else {
-      navigate("/spa-table");
+      navigate("");
     }
   }, [navigate, token]);
   return (
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/spa-table" element={<AuthPage />} />
-        <Route path="/spa-table/table" element={<TablePage />} />
+        <Route path="" element={<AuthPage />} />
+        <Route path="table" element={<TablePage />} />
       </Routes>
     </>
   );
