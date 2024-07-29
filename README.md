@@ -25,4 +25,8 @@ npm run dev
 ![Превью страницы авторизации](public/auth-preview.png)
 ### Таблица
 ![Превью страницы с таблицей](public/table-preview.png)
+### Работа с таблицей
+![Превью добавления](public/add-preview.png)
+![Превью изменения](public/change-preview.png)
+![Превью удаления](public/delete-preview.png)
 
