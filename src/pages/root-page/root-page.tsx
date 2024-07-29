@@ -19,8 +19,8 @@ export function RootPage() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<AuthPage />} />
-        <Route path="/table" element={<TablePage />} />
+        <Route path="/spa-table" element={<AuthPage />} />
+        <Route path="/spa-table/table" element={<TablePage />} />
       </Routes>
     </>
   );
