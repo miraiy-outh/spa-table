@@ -10,9 +10,9 @@ export function RootPage() {
 
   useEffect(() => {
     if (token) {
-      navigate("/table");
+      navigate("/spa-table/table");
     } else {
-      navigate("/");
+      navigate("/spa-table");
     }
   }, [navigate, token]);
   return (
