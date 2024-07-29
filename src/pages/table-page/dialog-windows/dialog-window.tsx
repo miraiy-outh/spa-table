@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { addLine, changeLine, deleteLine } from "../../../api";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  LinearProgress,
   TextField,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -16,7 +19,7 @@ import { TTable } from "../../../services/types/table-types";
 
 type DialogWindowProps = {
   open: boolean;
-  onClose: () => void;
+  onClose: (canceled: boolean) => void;
   flag: "add" | "change" | "delete" | "";
   row: TTable | null;
 };
@@ -24,6 +27,9 @@ type DialogWindowProps = {
 export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [isFilled, setIsFilled] = useState<boolean>(true);
+  const [isLoadingAction, setIsLoadingAction] = useState<boolean>(false);
 
   const [companySigDate, setCompanySigDate] = useState<string>("");
   const [companySignatureName, setCompanySignatureName] = useState<string>("");
@@ -36,7 +42,9 @@ export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
     useState<string>("");
 
   useEffect(() => {
-    if (row) {
+    setIsFilled(true);
+
+    if (row && flag === "change") {
       let newCompanySigDate = formatDateFromISO(row.companySigDate)[0];
       let newEmployeeSigDate = formatDateFromISO(row.employeeSigDate)[0];
       if (newCompanySigDate) setCompanySigDate(newCompanySigDate);
@@ -57,62 +65,86 @@ export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
       setEmployeeSigDate("");
       setEmployeeSignatureName("");
     }
-  }, [row]);
-
-  const isEditMode = flag === "change";
-  const isDeleteMode = flag === "delete";
-
-  const title = isEditMode
-    ? "Изменение записи"
-    : isDeleteMode
-    ? "Удаление записи"
-    : "Добавление записи";
+  }, [flag]);
 
   const handleDelete = () => {
     if (row) {
+      setIsLoadingAction(true);
       deleteLine(row.id).then(() => {
-        onClose();
+        setIsLoadingAction(false);
+        onClose(false);
       });
     }
   };
 
   const handleAdd = () => {
-    let employeeSigDateISO = formatDateToISO(new Date(employeeSigDate));
-    let companySigDateISO = formatDateToISO(new Date(companySigDate));
-
-    addLine({
-      companySigDate: companySigDateISO,
-      companySignatureName,
-      documentName,
-      documentStatus,
-      documentType,
-      employeeNumber,
-      employeeSigDate: employeeSigDateISO,
-      employeeSignatureName,
-    }).then(() => {
-      onClose();
-    });
+    if (
+      companySigDate === "" ||
+      employeeSigDate === "" ||
+      companySignatureName === "" ||
+      documentName === "" ||
+      documentStatus === "" ||
+      documentType === "" ||
+      employeeNumber === "" ||
+      employeeSignatureName === ""
+    ) {
+      setIsFilled(false);
+    } else {
+      setIsFilled(true);
+      let employeeSigDateISO = formatDateToISO(new Date(employeeSigDate));
+      let companySigDateISO = formatDateToISO(new Date(companySigDate));
+      setIsLoadingAction(true);
+      addLine({
+        companySigDate: companySigDateISO,
+        companySignatureName,
+        documentName,
+        documentStatus,
+        documentType,
+        employeeNumber,
+        employeeSigDate: employeeSigDateISO,
+        employeeSignatureName,
+      }).then(() => {
+        setIsLoadingAction(false);
+        onClose(false);
+      });
+    }
   };
 
   const handleChange = () => {
-    let employeeSigDateISO = formatDateToISO(new Date(employeeSigDate));
-    let companySigDateISO = formatDateToISO(new Date(companySigDate));
-    if (row) {
-      changeLine(
-        {
-          companySigDate: companySigDateISO,
-          companySignatureName,
-          documentName,
-          documentStatus,
-          documentType,
-          employeeNumber,
-          employeeSigDate: employeeSigDateISO,
-          employeeSignatureName,
-        },
-        row.id
-      ).then(() => {
-        onClose();
-      });
+    if (
+      companySigDate === "" ||
+      employeeSigDate === "" ||
+      companySignatureName === "" ||
+      documentName === "" ||
+      documentStatus === "" ||
+      documentType === "" ||
+      employeeNumber === "" ||
+      employeeSignatureName === ""
+    ) {
+      setIsFilled(false);
+    } else {
+      setIsFilled(true);
+      let employeeSigDateISO = formatDateToISO(new Date(employeeSigDate));
+      let companySigDateISO = formatDateToISO(new Date(companySigDate));
+      if (row) {
+        setIsLoadingAction(true);
+        changeLine(
+          {
+            companySigDate: companySigDateISO,
+            companySignatureName,
+            documentName,
+            documentStatus,
+            documentType,
+            employeeNumber,
+            employeeSigDate: employeeSigDateISO,
+            employeeSignatureName,
+          },
+          row.id
+        ).then(() => {
+          setIsLoadingAction(false);
+          onClose(false);
+        });
+      }
     }
   };
 
@@ -123,12 +155,21 @@ export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
       onClose={onClose}
       aria-labelledby="responsive-dialog-title"
     >
-      <DialogTitle id="responsive-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="responsive-dialog-title">
+        {flag === "change"
+          ? "Изменить запись"
+          : flag === "delete"
+          ? "Удалить запись"
+          : "Добавить запись"}
+      </DialogTitle>
       <DialogContent>
-        {isDeleteMode ? (
-          <DialogContentText>
-            Вы действительно хотите удалить запись {`"${row?.documentType}"`}?
-          </DialogContentText>
+        {flag === "delete" ? (
+          <>
+            <DialogContentText sx={{ mb: 2 }}>
+              Вы действительно хотите удалить запись {`"${row?.documentType}"`}?
+            </DialogContentText>
+            {isLoadingAction && <LinearProgress />}
+          </>
         ) : (
           <>
             <TextField
@@ -216,16 +257,25 @@ export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
               InputLabelProps={{
                 shrink: true,
               }}
+              sx={{ mb: 2 }}
             />
+            {!isFilled ? (
+              <Typography hidden={isFilled} color="error">
+                Заполните все поля
+              </Typography>
+            ) : (
+              <></>
+            )}
+            {isLoadingAction && <LinearProgress />}
           </>
         )}
       </DialogContent>
       <DialogActions>
-        {isEditMode ? (
+        {flag === "change" ? (
           <Button onClick={handleChange} color="success">
             Сохранить
           </Button>
-        ) : isDeleteMode ? (
+        ) : flag === "delete" ? (
           <Button onClick={handleDelete} color="error">
             Удалить
           </Button>
@@ -234,7 +284,7 @@ export function DialogWindow({ open, onClose, flag, row }: DialogWindowProps) {
             Добавить
           </Button>
         )}
-        <Button onClick={onClose}>Отмена</Button>
+        <Button onClick={() => onClose(true)}>Отмена</Button>
       </DialogActions>
     </Dialog>
   );

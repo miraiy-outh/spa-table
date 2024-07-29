@@ -7,7 +7,13 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Fragment, useEffect, useState } from "react";
 import { getTable } from "../../api";
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { formatDateFromISO } from "../../utils/date-format";
 import { DialogWindow } from "./dialog-windows/dialog-window";
@@ -19,10 +25,14 @@ export function TablePage() {
   const [table, setTable] = useState<TTable[]>([]);
   const [flag, setFlag] = useState<TFlag>("");
   const [selectedRow, setSelectedRow] = useState<TTable | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
+    setIsLoading(true);
     getTable().then((tableData) => {
       setTable(tableData);
+      setIsLoading(false);
     });
   }, []);
 
@@ -30,14 +40,27 @@ export function TablePage() {
     setFlag(flag);
     if (row) setSelectedRow(row);
   };
-
   const handleClose = () => {
     setFlag("");
     setSelectedRow(null);
+  };
+
+  const refreshTable = () => {
+    setIsLoading(true);
     getTable().then((tableData) => {
       setTable(tableData);
+      setIsLoading(false);
     });
   };
+
+  const handleDialogClose = (canceled: boolean) => {
+    handleClose();
+    if (!canceled) {
+      refreshTable();
+    }
+  };
+
+  const handleUploadTable = () => {};
 
   return (
     <TableContainer component={Paper}>
@@ -61,12 +84,19 @@ export function TablePage() {
                 variant="contained"
                 size="small"
                 color="success"
+                disabled={isLoading || flag != ""}
                 onClick={() => handleOpen("add")}
               >
                 Добавить
               </Button>
             </TableCell>
-            <TableCell></TableCell>
+            <TableCell>
+              {isLoading && (
+                <Box sx={{ display: "flex" }}>
+                  <CircularProgress />
+                </Box>
+              )}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -112,6 +142,7 @@ export function TablePage() {
                   <Button
                     variant="contained"
                     size="small"
+                    disabled={isLoading || flag != ""}
                     onClick={() => handleOpen("change", line)}
                   >
                     Изменить
@@ -123,6 +154,7 @@ export function TablePage() {
                   variant="contained"
                   size="small"
                   color="error"
+                  disabled={isLoading || flag != ""}
                   onClick={() => handleOpen("delete", line)}
                 >
                   Удалить
@@ -134,7 +166,7 @@ export function TablePage() {
       </TableItem>
       <DialogWindow
         open={flag !== ""}
-        onClose={handleClose}
+        onClose={handleDialogClose}
         flag={flag}
         row={selectedRow}
       />
