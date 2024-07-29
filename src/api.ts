@@ -24,13 +24,12 @@ export async function getAuthToken(
       username,
       password,
     }),
-  }).then((res) => {
+  }).then(async (res) => {
     if (res.status === 200) {
-      return res.json().then((tokenData) => {
-        const token = tokenData.data.token;
-        saveToken(token);
-        return Promise.resolve(token);
-      });
+      const tokenData = await res.json();
+      const token = tokenData.data.token;
+      saveToken(token);
+      return await Promise.resolve(token);
     }
     return Promise.reject(new Error("Login failed"));
   });
@@ -42,13 +41,12 @@ export async function getTable(): Promise<TTable[]> {
     headers: {
       "x-auth": getToken(),
     },
-  }).then((res) => {
+  }).then(async (res) => {
     if (res.status === 200) {
-      return res.json().then((data) => {
-        const tableData = data.data;
-        if (tableData !== null) return Promise.resolve(tableData);
-        else return Promise.reject(new Error("Table get failed"));
-      });
+      const data = await res.json();
+      const tableData = data.data;
+      if (tableData !== null) return Promise.resolve(tableData);
+      else return Promise.reject(new Error("Table get failed"));
     }
     return Promise.reject(new Error("Table get failed"));
   });
@@ -60,15 +58,14 @@ export async function deleteLine(id: string) {
     headers: {
       "x-auth": getToken(),
     },
-  }).then((res) => {
+  }).then(async (res) => {
     if (res.status === 200) {
-      return res.json().then((data) => {
-        console.log(id);
-        console.log(data);
-        if (data.error_code === 0)
-          return Promise.resolve(`Line with id=${id} deleted`);
-        else return Promise.reject(new Error("Line delete failed"));
-      });
+      const data = await res.json();
+      console.log(id);
+      console.log(data);
+      if (data.error_code === 0)
+        return Promise.resolve(`Line with id=${id} deleted`);
+      else return Promise.reject(new Error("Line delete failed"));
     }
     return Promise.reject(new Error("Line delete failed"));
   });
@@ -82,11 +79,9 @@ export async function addLine(line: TTableExport) {
       "x-auth": getToken(),
     },
     body: JSON.stringify(line),
-  }).then((res) => {
+  }).then(async (res) => {
     if (res.status === 200) {
-      return res.json().then((data) => {
-        return Promise.resolve("New line created");
-      });
+      return await Promise.resolve("New line created");
     }
     console.log(line, JSON.stringify(line));
     return Promise.reject(new Error("Line add failed"));
@@ -101,11 +96,9 @@ export async function changeLine(line: TTableExport, id: string) {
       "x-auth": getToken(),
     },
     body: JSON.stringify(line),
-  }).then((res) => {
+  }).then(async (res) => {
     if (res.status === 200) {
-      return res.json().then((data) => {
-        return Promise.resolve(`Line with id=${id} changed`);
-      });
+      return await Promise.resolve(`Line with id=${id} changed`);
     }
     console.log(line, JSON.stringify(line));
     return Promise.reject(new Error("Line change failed"));

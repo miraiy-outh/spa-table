@@ -26,7 +26,6 @@ export function TablePage() {
   const [flag, setFlag] = useState<TFlag>("");
   const [selectedRow, setSelectedRow] = useState<TTable | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -59,8 +58,6 @@ export function TablePage() {
       refreshTable();
     }
   };
-
-  const handleUploadTable = () => {};
 
   return (
     <TableContainer component={Paper}>
