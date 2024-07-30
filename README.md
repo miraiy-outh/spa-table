@@ -10,6 +10,10 @@
 ## Хостинг
 Попробовать можно здесь [https://miraiy-outh.github.io/spa-table/](https://miraiy-outh.github.io/spa-table/)
 
+## Авторизация
+Логин: user1
+Пароль: password
+
 ## Установка и запуск
 
 Установить зависимости:
